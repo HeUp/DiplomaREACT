@@ -1,0 +1,65 @@
+{
+  "name": "react-spa",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.0.1",
+    "@mui/lab": "^9.0.0-beta.3",
+    "@mui/material": "^9.0.1",
+    "@tanstack/react-query": "^5.100.14",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.16.1",
+    "dexie": "^4.4.2",
+    "pptxgenjs": "^4.0.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-dropzone": "^15.0.0",
+    "react-router-dom": "^6.30.4",
+    "react-scripts": "5.0.1",
+    "sql.js": "^1.14.1",
+    "web-vitals": "^2.1.4",
+    "zustand": "^5.0.13",
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^10.0.0"
+  },
+  "scripts": {
+    "start": "node server/src/index.js",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "start:client": "react-scripts start",
+    "dev": "concurrently --kill-others \"npm start\" \"npm run start:client\"",
+    "postinstall": "node -e \"require('fs').copyFileSync(require('path').join('node_modules','sql.js','dist','sql-wasm-browser.wasm'),require('path').join('public','sql-wasm-browser.wasm'));require('fs').copyFileSync(require('path').join('node_modules','sql.js','dist','sql-wasm.wasm'),require('path').join('public','sql-wasm.wasm'));console.log('[postinstall] WASM files copied to public/')\""
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "proxy": "http://localhost:5000",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
