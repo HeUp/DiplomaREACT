@@ -5,11 +5,7 @@ const useUIStore = create((set, get) => ({
   isOnline: navigator.onLine,
   themeMode: 'dark',
   notification: null,
-  notifications: [
-    { id: 1, title: 'Новая задача', message: 'Назначена задача "Монтаж перекрытий"', time: '5 мин назад', unread: true },
-    { id: 2, title: 'Изменение статуса', message: 'Задача "Устройство фундамента" завершена', time: '1 час назад', unread: true },
-    { id: 3, title: 'Запрос материалов', message: 'Поступила новая заявка на бетон', time: '3 часа назад', unread: false },
-  ],
+  notifications: [],
 
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
   toggleTheme: () => set((s) => ({ themeMode: s.themeMode === 'dark' ? 'light' : 'dark' })),

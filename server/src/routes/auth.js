@@ -152,6 +152,39 @@ router.patch('/profile', authenticate, async (req, res) => {
   }
 });
 
+router.post('/register', async (req, res) => {
+  try {
+    const { full_name, password, phone } = req.body;
+    const email = (req.body.email || '').toLowerCase();
+
+    if (!full_name || !email || !password) {
+      return res.status(400).json({ message: 'Имя, email и пароль обязательны' });
+    }
+    if (password.length < 4) {
+      return res.status(400).json({ message: 'Пароль должен быть минимум 4 символа' });
+    }
+
+    await getDb();
+    const existing = prepare('SELECT id FROM users WHERE email = ?').get(email);
+    if (existing) {
+      return res.status(409).json({ message: 'Пользователь с таким email уже существует' });
+    }
+
+    const hash = bcrypt.hashSync(password, 10);
+    const result = prepare(
+      'INSERT INTO users (full_name, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?)'
+    ).run(full_name, email, hash, 'foreman', phone || '');
+
+    const user = prepare(
+      'SELECT id, full_name, email, role, phone, profile_picture, created_at FROM users WHERE id = ?'
+    ).get(result.lastInsertRowid);
+
+    res.status(201).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.post('/profile/photo', authenticate, profileUpload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'Файл не загружен' });

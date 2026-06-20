@@ -12,6 +12,9 @@ export const authApi = {
   updateProfile: (data) =>
     axiosClient.patch('/auth/profile', data).then((r) => r.data),
 
+  register: (data) =>
+    axiosClient.post('/auth/register', data).then((r) => r.data),
+
   uploadProfilePhoto: (formData) =>
     axiosClient.post('/auth/profile/photo', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

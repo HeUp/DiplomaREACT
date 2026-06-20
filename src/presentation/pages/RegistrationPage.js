@@ -5,7 +5,7 @@ import {
   InputAdornment, IconButton, Link,
 } from '@mui/material';
 import { Visibility, VisibilityOff, HowToReg } from '@mui/icons-material';
-import { userApi } from '../../data-access/api/userApi';
+import { authApi } from '../../data-access/api/authApi';
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -32,11 +32,10 @@ const RegistrationPage = () => {
 
     setLoading(true);
     try {
-      await userApi.create({
+      await authApi.register({
         full_name: form.full_name.trim(),
         email: form.email.trim().toLowerCase(),
         password: form.password,
-        role: 'foreman',
       });
       navigate('/login?registered=1');
     } catch (err) {

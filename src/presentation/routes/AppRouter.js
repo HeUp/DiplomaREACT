@@ -16,6 +16,7 @@ import SupplyPage from '../pages/SupplyPage';
 import SupplySummaryPage from '../pages/SupplySummaryPage';
 import AdminPage from '../pages/AdminPage';
 import ProfilePage from '../pages/ProfilePage';
+import ProjectsPage from '../pages/ProjectsPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 const roleHome = {
@@ -110,6 +111,14 @@ const AppRouter = () => {
           }
         />
 
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute roles={[ROLES.MANAGER, ROLES.ADMIN]}>
+              <ProjectsPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/users"
           element={
