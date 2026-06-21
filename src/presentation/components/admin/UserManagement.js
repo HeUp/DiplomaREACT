@@ -136,15 +136,14 @@ const UserManagement = ({ users, onCreate, onUpdate, onDelete }) => {
               </MenuItem>
             ))}
           </TextField>
-          {!editingUser && (
-            <TextField
-              label="Пароль"
-              type="password"
-              fullWidth
-              value={form.password}
-              onChange={handleChange('password')}
-            />
-          )}
+          <TextField
+            label="Пароль"
+            type="password"
+            fullWidth
+            value={form.password}
+            onChange={handleChange('password')}
+            placeholder={editingUser ? 'Оставьте пустым, чтобы не менять' : ''}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Отмена</Button>
