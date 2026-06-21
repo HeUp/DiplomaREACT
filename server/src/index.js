@@ -28,6 +28,15 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/users', userRoutes);
 
+const BUILD_DIR = path.join(__dirname, '..', '..', 'build');
+if (fs.existsSync(BUILD_DIR)) {
+  app.use(express.static(BUILD_DIR));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/uploads/')) return next();
+    res.sendFile(path.join(BUILD_DIR, 'index.html'));
+  });
+}
+
 app.use((err, req, res, next) => {
   console.error('[Error]', err);
   if (err) {
