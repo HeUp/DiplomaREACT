@@ -89,6 +89,7 @@ const ManagerTasksPage = () => {
         onSubmit={editTask ? handleUpdate : handleCreate}
         initialData={editTask}
         projects={projects}
+        onProjectCreate={(p) => setProjects((prev) => [...prev, p])}
       />
     </Box>
   );

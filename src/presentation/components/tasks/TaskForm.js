@@ -7,18 +7,23 @@ import {
   TextField,
   Button,
   MenuItem,
+  IconButton,
+  Box,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { Add } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
 import { TASK_STATUS, TASK_STATUS_LABELS } from '../../../data-access/types';
+import { projectApi } from '../../../data-access/api/projectApi';
+import useUIStore from '../../../state/uiStore';
 
 const statusOptions = Object.entries(TASK_STATUS_LABELS).map(([value, label]) => ({
   value,
   label,
 }));
 
-const TaskForm = ({ open, onClose, onSubmit, initialData, projects }) => {
+const TaskForm = ({ open, onClose, onSubmit, initialData, projects, onProjectCreate }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isEditing = !!initialData;
@@ -41,6 +46,10 @@ const TaskForm = ({ open, onClose, onSubmit, initialData, projects }) => {
     workType: initialData?.workType || '',
   });
 
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+  const [newProjectForm, setNewProjectForm] = useState({ name: '', address: '' });
+  const showNotification = useUIStore((s) => s.showNotification);
+
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
   };
@@ -54,6 +63,28 @@ const TaskForm = ({ open, onClose, onSubmit, initialData, projects }) => {
       parent_task_id: form.parent_task_id || null,
       project_id: form.project_id || null,
     });
+  };
+
+  const handleCreateProject = async () => {
+    if (!newProjectForm.name.trim()) {
+      showNotification('Название проекта обязательно', 'warning');
+      return;
+    }
+    try {
+      const project = await projectApi.create(newProjectForm);
+      if (onProjectCreate) onProjectCreate(project);
+      setForm((prev) => ({
+        ...prev,
+        project_id: String(project.id),
+        objectName: project.name,
+        objectAddress: project.address || prev.objectAddress,
+      }));
+      setProjectDialogOpen(false);
+      setNewProjectForm({ name: '', address: '' });
+      showNotification('Проект создан', 'success');
+    } catch {
+      showNotification('Ошибка создания проекта', 'error');
+    }
   };
 
   return (
@@ -85,32 +116,42 @@ const TaskForm = ({ open, onClose, onSubmit, initialData, projects }) => {
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="Объект строительства"
-              select={!!projects?.length}
-              fullWidth
-              value={form.project_id || form.objectName}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (projects?.length) {
-                  const project = projects.find((p) => String(p.id) === val);
-                  setForm((prev) => ({
-                    ...prev,
-                    project_id: val,
-                    objectName: project?.name || val,
-                    objectAddress: project?.address || prev.objectAddress,
-                  }));
-                } else {
-                  setForm((prev) => ({ ...prev, objectName: val }));
-                }
-              }}
-            >
-              {projects?.map((p) => (
-                <MenuItem key={p.id} value={String(p.id)}>
-                  {p.name}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+              <TextField
+                label="Объект строительства"
+                select={!!projects?.length}
+                fullWidth
+                value={form.project_id || form.objectName}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (projects?.length) {
+                    const project = projects.find((p) => String(p.id) === val);
+                    setForm((prev) => ({
+                      ...prev,
+                      project_id: val,
+                      objectName: project?.name || val,
+                      objectAddress: project?.address || prev.objectAddress,
+                    }));
+                  } else {
+                    setForm((prev) => ({ ...prev, objectName: val }));
+                  }
+                }}
+              >
+                {projects?.map((p) => (
+                  <MenuItem key={p.id} value={String(p.id)}>
+                    {p.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <IconButton
+                color="primary"
+                onClick={() => setProjectDialogOpen(true)}
+                sx={{ mt: 1 }}
+                title="Добавить новый объект"
+              >
+                <Add />
+              </IconButton>
+            </Box>
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -198,6 +239,19 @@ const TaskForm = ({ open, onClose, onSubmit, initialData, projects }) => {
           </Grid>
         </Grid>
       </DialogContent>
+
+      <Dialog open={projectDialogOpen} onClose={() => setProjectDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Новый объект строительства</DialogTitle>
+        <DialogContent>
+          <TextField label="Название" fullWidth required value={newProjectForm.name} onChange={(e) => setNewProjectForm((p) => ({ ...p, name: e.target.value }))} sx={{ mt: 1, mb: 2 }} />
+          <TextField label="Адрес" fullWidth value={newProjectForm.address} onChange={(e) => setNewProjectForm((p) => ({ ...p, address: e.target.value }))} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setProjectDialogOpen(false)}>Отмена</Button>
+          <Button variant="contained" onClick={handleCreateProject}>Создать</Button>
+        </DialogActions>
+      </Dialog>
+
       <DialogActions>
         <Button onClick={onClose}>Отмена</Button>
         <Button variant="contained" onClick={handleSubmit}>
